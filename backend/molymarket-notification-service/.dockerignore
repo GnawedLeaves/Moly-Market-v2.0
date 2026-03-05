@@ -1,0 +1,10 @@
+.gradle/
+build/
+bin/
+.vscode/
+.git/
+.gitignore
+.gitattributes
+Dockerfile
+.dockerignore
+*.md

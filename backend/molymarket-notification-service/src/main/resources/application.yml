@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/local
+    username: postgres
+    password: polymoly123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      "[hibernate.dialect]": org.hibernate.dialect.PostgreSQLDialect
+  cloud:
+    aws:
+      sqs:
+        endpoint: ${SQS_ENDPOINT:http://localhost:4566}
+      region:
+        static: us-east-1
+      credentials:
+        access-key: test
+        secret-key: test
+
+server:
+  port: 8084
+  address: 0.0.0.0
+
+notification:
+  queue:
+    name: ${NOTIFICATION_QUEUE:notification-queue}
+
+SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872
