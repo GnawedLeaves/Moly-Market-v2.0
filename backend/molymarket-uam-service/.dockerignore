@@ -1,0 +1,12 @@
+.gradle
+build
+bin
+.vscode
+.git
+.gitignore
+.gitattributes
+Dockerfile
+.dockerignore
+README.md
+GEMINI.md
+gradlew.bat

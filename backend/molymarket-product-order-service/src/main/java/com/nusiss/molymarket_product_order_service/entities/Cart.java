@@ -1,0 +1,45 @@
+package com.nusiss.molymarket_product_order_service.entities;
+
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Table(name = "carts")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Cart {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "buyer_id", nullable = false)
+    private Long buyerId;
+
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems;
+
+    private Double totalAmount = 0.0;
+
+    public void updateTotalAmount(){
+        this.totalAmount = cartItems.stream()
+            .map((item) -> item.getProduct().getHasDiscount() ? 
+            item.getProduct().getPrice() * (100 - item.getProduct().getDiscountPercentage()) / 100 * item.getQuantity() : 
+            item.getProduct().getPrice() * item.getQuantity())
+            .reduce(0.0, Double::sum);
+    }
+    
+
+}

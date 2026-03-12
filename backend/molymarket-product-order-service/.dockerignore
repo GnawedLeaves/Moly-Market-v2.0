@@ -1,0 +1,11 @@
+.gradle
+build
+bin
+out
+.idea
+.vscode
+.git
+*.log
+!gradlew
+!gradlew.bat
+!gradle/
