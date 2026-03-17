@@ -31,11 +31,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set lowercase owner
+        run: echo "LOWER_OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: backend/${{ matrix.service }}
           push: ${{ github.event_name == 'push' }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:latest
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:${{ github.sha }}
+            ghcr.io/${{ env.LOWER_OWNER }}/${{ matrix.service }}:latest
+            ghcr.io/${{ env.LOWER_OWNER }}/${{ matrix.service }}:${{ github.sha }}
