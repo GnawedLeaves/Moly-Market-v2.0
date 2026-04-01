@@ -1,7 +1,8 @@
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "../../redux/store";
-import { logout } from "../../redux/userSlice";
+import { logout, updateBalance } from "../../redux/userSlice";
 import { BUYER } from "../../constants/constants";
 import {
   Avatar,
@@ -13,6 +14,8 @@ import {
   Row,
   Col,
   Statistic,
+  Modal,
+  message,
 } from "antd";
 import {
   DollarOutlined,
@@ -21,6 +24,9 @@ import {
   UserOutlined,
   ShoppingOutlined,
   ShopOutlined,
+  PlusOutlined,
+  BankOutlined,
+  CreditCardOutlined,
 } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import { useDesignToken } from "../../DesignToken";
@@ -32,6 +38,8 @@ function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const token = useDesignToken();
+
+  const [isTopUpModalVisible, setIsTopUpModalVisible] = useState(false);
 
   const onLogout = () => {
     dispatch(logout(user));
@@ -50,6 +58,18 @@ function Profile() {
     if (user.role !== BUYER) {
       navigate("/sellerProducts");
     }
+  };
+
+  const showTopUpModal = () => {
+    setIsTopUpModalVisible(true);
+  };
+
+  const handleTopUp = (method: string) => {
+    const topUpAmount = 100; // Hardcoded amount for now
+    const newBalance = (user.balance || 0) + topUpAmount;
+    dispatch(updateBalance(newBalance));
+    message.success(`Successfully topped up $${topUpAmount} via ${method}!`);
+    setIsTopUpModalVisible(false);
   };
 
   const { Title, Text, Paragraph } = Typography;
@@ -160,6 +180,20 @@ function Profile() {
                         style={{ textAlign: "center" }}
                         valueStyle={{ color: token.colorPrimary }}
                       />
+                      {user.role === BUYER && (
+                        <CustomButton
+                          type="primary"
+                          icon={<PlusOutlined />}
+                          onClick={showTopUpModal}
+                          style={{
+                            width: "100%",
+                            marginTop: 12,
+                            background: token.colorPrimary,
+                          }}
+                        >
+                          Top Up
+                        </CustomButton>
+                      )}
                     </CustomCard>
 
                     {/* Action Buttons */}
@@ -200,65 +234,6 @@ function Profile() {
                       background: token.colorBgWhite,
                     }}
                   >
-                    {/* <Descriptions
-                      column={{ xs: 1, sm: 1, md: 1 }}
-                      bordered
-                      size="middle"
-                      labelStyle={{
-                        fontWeight: "bold",
-                        width: 120,
-                      }}
-                    >
-                      <Descriptions.Item
-                        label="Username"
-                        labelStyle={{ color: token.colorTextBaseSecondary }}
-                      >
-                        <Flex align="center" gap={8}>
-                          <RobotOutlined
-                            style={{ color: token.colorPrimary }}
-                          />
-                          <Text>{user.username} hello</Text>
-                        </Flex>
-                      </Descriptions.Item>
-
-                      <Descriptions.Item
-                        label="Role"
-                        labelStyle={{ color: token.colorTextBaseSecondary }}
-                      >
-                        <Flex align="center" gap={8}>
-                          <ContactsOutlined
-                            style={{ color: token.colorPrimary }}
-                          />
-                          <Text>
-                            {user.role === BUYER ? "Buyer" : "Seller"}
-                          </Text>
-                        </Flex>
-                      </Descriptions.Item>
-
-                      <Descriptions.Item
-                        label={user.role === BUYER ? "Address" : "UEN"}
-                        labelStyle={{ color: token.colorTextBaseSecondary }}
-                      >
-                        <Flex align="center" gap={8}>
-                          <BookOutlined style={{ color: token.colorPrimary }} />
-                          <Text>
-                            {user.role === BUYER ? user.address : user.uen}
-                          </Text>
-                        </Flex>
-                      </Descriptions.Item>
-
-                      <Descriptions.Item
-                        label="Balance"
-                        labelStyle={{ color: token.colorTextBaseSecondary }}
-                      >
-                        <Flex align="center" gap={8}>
-                          <DollarOutlined
-                            style={{ color: token.colorPrimary }}
-                          />
-                          <Text>${user.balance?.toFixed(2)}</Text>
-                        </Flex>
-                      </Descriptions.Item>
-                    </Descriptions> */}
                     <CustomCard
                       title="Username"
                       style={{
@@ -335,6 +310,49 @@ function Profile() {
           </Col>
         </Row>
       </Content>
+
+      <Modal
+        title="Top Up Balance"
+        open={isTopUpModalVisible}
+        onCancel={() => setIsTopUpModalVisible(false)}
+        footer={null}
+        centered
+      >
+        <Paragraph>
+          Select your preferred top-up method. For demonstration purposes, each
+          top-up will add <strong>$100.00</strong> to your account.
+        </Paragraph>
+        <Flex vertical gap={12} style={{ marginTop: 20 }}>
+          <CustomButton
+            icon={<BankOutlined />}
+            size="large"
+            onClick={() => handleTopUp("Bank Transfer")}
+            style={{
+              height: "60px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              padding: "0 24px",
+            }}
+          >
+            Bank Transfer
+          </CustomButton>
+          <CustomButton
+            icon={<CreditCardOutlined />}
+            size="large"
+            onClick={() => handleTopUp("Credit Card")}
+            style={{
+              height: "60px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "flex-start",
+              padding: "0 24px",
+            }}
+          >
+            Credit Card Top Up
+          </CustomButton>
+        </Flex>
+      </Modal>
     </Layout>
   );
 }

@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  molymarket-uam-service:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/molymarket-uam-service:latest
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${RDS_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${RDS_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+    restart: always
+
+  molymarket-payment-service:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/molymarket-payment-service:latest
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${RDS_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${RDS_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+    restart: always
+
+  molymarket-notification-service:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/molymarket-notification-service:latest
+    ports:
+      - "8084:8084"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${RDS_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${RDS_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - CLOUD_AWS_SQS_ENDPOINT=${SQS_ENDPOINT}
+      - CLOUD_AWS_REGION_STATIC=${AWS_REGION}
+      - CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+      - CLOUD_AWS_CREDENTIALS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY}
+      - NOTIFICATION_QUEUE=${NOTIFICATION_QUEUE_NAME}
+    restart: always
+
+  molymarket-product-order-service:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/molymarket-product-order-service:latest
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+      - SPRING_DATASOURCE_USERNAME=${RDS_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${RDS_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - CLOUD_AWS_SQS_ENDPOINT=${SQS_ENDPOINT}
+      - CLOUD_AWS_REGION_STATIC=${AWS_REGION}
+      - CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${AWS_ACCESS_KEY_ID}
+      - CLOUD_AWS_CREDENTIALS_SECRET_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AUTH_SERVICE_URL=http://molymarket-uam-service:8082
+      - PAYMENT_SERVICE_URL=http://molymarket-payment-service:8083
+      - NOTIFICATION_SERVICE_URL=http://molymarket-notification-service:8084
+      - NOTIFICATION_QUEUE=${NOTIFICATION_QUEUE_NAME}
+    restart: always
+
+  molymarket-frontend:
+    image: ${DOCKER_HUB_USERNAME:-yourusername}/molymarket-frontend:latest
+    ports:
+      - "80:80"
+    environment:
+      - VITE_UAM_SERVICE_URL=${PROD_UAM_SERVICE_URL}
+      - VITE_PAYMENT_SERVICE_URL=${PROD_PAYMENT_SERVICE_URL}
+      - VITE_NOTIFICATION_SERVICE_URL=${PROD_NOTIFICATION_SERVICE_URL}
+      - VITE_PRODUCT_ORDER_SERVICE_URL=${PROD_PRODUCT_ORDER_SERVICE_URL}
+    restart: always

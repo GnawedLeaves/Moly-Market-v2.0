@@ -56,6 +56,10 @@ const userSlice = createSlice({
       // Update local storage so the changes persist
       localStorage.setItem("user", JSON.stringify(state));
     },
+    updateBalance: (state, action: PayloadAction<number>) => {
+      state.balance = action.payload;
+      localStorage.setItem("user", JSON.stringify(state));
+    },
     logout: (state) => {
       localStorage.removeItem("user");
       state.username = "";
@@ -68,5 +72,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { login, updateUser, logout } = userSlice.actions;
+export const { login, updateUser, updateBalance, logout } = userSlice.actions;
 export default userSlice.reducer;
