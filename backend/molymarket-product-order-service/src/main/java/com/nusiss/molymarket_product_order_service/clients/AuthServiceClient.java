@@ -18,7 +18,7 @@ public class AuthServiceClient {
 
     public void updateBalance(String userId, Double amount, String operation) {
         String url = UriComponentsBuilder.fromUriString(authServiceUrl)
-                .path("/auth/updateBalanceById")
+                .path("/api/uam/auth/updateBalanceById")
                 .queryParam("userId", userId)
                 .queryParam("amount", amount)
                 .queryParam("operation", operation)
@@ -29,7 +29,7 @@ public class AuthServiceClient {
 
     public Long getUserIdByUsername(String username) {
         String url = UriComponentsBuilder.fromUriString(authServiceUrl)
-                .path("/auth/getUserId")
+                .path("/api/uam/auth/getUserId")
                 .queryParam("username", username)
                 .toUriString();
 

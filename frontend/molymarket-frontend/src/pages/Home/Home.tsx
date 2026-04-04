@@ -35,7 +35,7 @@ function HomePage() {
 
   const fetchCart = async () => {
     const response = await axios.get(
-      `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/${user?.id}`,
+      `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/${user?.id}`,
       config
     );
     setCart(response.data);
@@ -46,7 +46,7 @@ function HomePage() {
       const response = await axios.get(
         `${
           import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL
-        }/api/products/search?name=${query}&category=${category}&page=${page}&size=8`,
+        }/api/product-order/products/search?name=${query}&category=${category}&page=${page}&size=8`,
         config
       );
       setProducts(response.data.content);

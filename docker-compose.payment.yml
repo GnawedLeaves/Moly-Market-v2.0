@@ -1,0 +1,13 @@
+services:
+  payment-service:
+    build:
+      context: ./backend/molymarket-payment-service
+      dockerfile: Dockerfile
+    container_name: molymarket-payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5LPknwJUh0dJtp
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872

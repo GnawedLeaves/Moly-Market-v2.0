@@ -1,0 +1,54 @@
+{
+  "family": "notification-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "notification-service",
+      "image": "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_AWS_REGION.amazonaws.com/molymarket-notification-service:latest",
+      "portMappings": [
+        {
+          "containerPort": 8084,
+          "hostPort": 8084,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+        },
+        {
+          "name": "SPRING_DATASOURCE_USERNAME",
+          "value": "postgres"
+        },
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "value": "5LPknwJUh0dJtp"
+        },
+        {
+          "name": "SQS_ENDPOINT",
+          "value": "http://localstack:4566"
+        },
+        {
+          "name": "SECRET_KEY",
+          "value": "d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/notification-service",
+          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+}

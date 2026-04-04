@@ -17,7 +17,7 @@ import com.nusiss.molymarket_product_order_service.entities.Review;
 import com.nusiss.molymarket_product_order_service.services.ReviewServiceImpl;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api/product-order/reviews")
 public class ReviewController {
     
     @Autowired

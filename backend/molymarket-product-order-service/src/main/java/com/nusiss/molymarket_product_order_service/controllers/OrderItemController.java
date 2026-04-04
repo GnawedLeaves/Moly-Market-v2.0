@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nusiss.molymarket_product_order_service.services.interfaces.OrderItemService;
 
 @RestController
-@RequestMapping("/api/order-items")
+@RequestMapping("/api/product-order/order-items")
 public class OrderItemController {
 
     @Autowired

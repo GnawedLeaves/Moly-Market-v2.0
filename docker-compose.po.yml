@@ -1,0 +1,13 @@
+services:
+  product-order-service:
+    build:
+      context: ./backend/molymarket-product-order-service
+      dockerfile: Dockerfile
+    container_name: molymarket-product-order-service
+    ports:
+      - "8085:8085"
+    environment:
+      AWS_REGION: ap-southeast-2
+      AUTH_SERVICE_URL: http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com
+      PAYMENT_SERVICE_URL: http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com
+      NOTIFICATION_SERVICE_URL: http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com

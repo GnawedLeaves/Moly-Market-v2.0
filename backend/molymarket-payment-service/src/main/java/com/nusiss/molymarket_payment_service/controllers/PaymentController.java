@@ -14,17 +14,23 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/payment")
+@RequestMapping("/api/payment/pay")
 public class PaymentController {
 
     private final PaymentService paymentService;
     private static final Logger logger = LoggerFactory.getLogger(PaymentController.class);
+
+    @GetMapping("/welcome")
+    public String welcome() {
+        return "Welcome to Moly Market Payment Service!";
+    }
 
     @PostMapping
     public ResponseEntity<String> makePayment(@RequestBody RequestPaymentDto requestBody) {

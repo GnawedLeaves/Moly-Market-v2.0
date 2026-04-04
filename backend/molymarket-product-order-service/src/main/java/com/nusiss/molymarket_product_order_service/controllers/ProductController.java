@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/api/product-order/products")
 public class ProductController {
 
     @Autowired
@@ -155,6 +155,11 @@ public class ProductController {
         logger.info("SEARCHING: {} {} {} {}", name, category, page, size);
         Page<ProductDto> productPage = productService.searchProduct(name, category, page, size);
         return ResponseEntity.ok(productPage);
+    }
+
+    @GetMapping("/welcome")
+    public ResponseEntity<String> welcome() {
+        return new ResponseEntity<>("Welcome to Product Order Service", HttpStatus.OK);
     }
     
 }

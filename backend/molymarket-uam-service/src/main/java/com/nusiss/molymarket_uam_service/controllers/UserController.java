@@ -34,7 +34,7 @@ import org.springframework.security.core.Authentication;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/auth")
+@RequestMapping("/api/uam/auth")
 public class UserController {
 
     private final UserInfoService userService;

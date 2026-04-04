@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 
 @RestController
-@RequestMapping("/api/cart")
+@RequestMapping("/api/product-order/cart")
 public class CartController {
 
     @Autowired

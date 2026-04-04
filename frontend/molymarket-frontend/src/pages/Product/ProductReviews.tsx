@@ -81,7 +81,7 @@ const ProductReviews = () => {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/products/${product.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/products/${product.id}`,
         config
       );
       setProduct(response.data);
@@ -105,7 +105,7 @@ const ProductReviews = () => {
 
     try {
       await axios.post(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/reviews/write`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/reviews/write`,
         review,
         config
       );
@@ -122,7 +122,7 @@ const ProductReviews = () => {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/reviews/product/${product.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/reviews/product/${product.id}`,
         config
       );
       const data = response.data.reverse();
@@ -163,7 +163,7 @@ const ProductReviews = () => {
         axios.get(
           `${
             import.meta.env.VITE_UAM_SERVICE_URL
-          }/auth/buyerProfile?buyerId=${buyerId}`,
+          }/api/uam/auth/buyerProfile?buyerId=${buyerId}`,
           config
         )
       );

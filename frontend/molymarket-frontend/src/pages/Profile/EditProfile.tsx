@@ -90,8 +90,8 @@ function EditProfile() {
 
       const endpoint =
         user.role === BUYER
-          ? `${import.meta.env.VITE_UAM_SERVICE_URL!}/auth/buyerProfile`
-          : `${import.meta.env.VITE_UAM_SERVICE_URL!}/auth/sellerProfile`;
+          ? `${import.meta.env.VITE_UAM_SERVICE_URL!}/api/uam/auth/buyerProfile`
+          : `${import.meta.env.VITE_UAM_SERVICE_URL!}/api/uam/auth/sellerProfile`;
 
       await axios.post(endpoint, updateData, config);
 

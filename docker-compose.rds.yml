@@ -1,0 +1,93 @@
+services:
+  localstack:
+    image: localstack/localstack
+    container_name: molymarket-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=sqs
+      - DEFAULT_REGION=us-east-1
+    volumes:
+      - "./infra/localstack/init-sqs.sh:/etc/localstack/init/ready.d/init-sqs.sh"
+      - "./infra/localstack/data:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  uam-service:
+    build:
+      context: ./backend/molymarket-uam-service
+      dockerfile: Dockerfile
+    container_name: molymarket-uam-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5LPknwJUh0dJtp
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872
+
+  payment-service:
+    build:
+      context: ./backend/molymarket-payment-service
+      dockerfile: Dockerfile
+    container_name: molymarket-payment-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5LPknwJUh0dJtp
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872
+
+  notification-service:
+    build:
+      context: ./backend/molymarket-notification-service
+      dockerfile: Dockerfile
+    container_name: molymarket-notification-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5LPknwJUh0dJtp
+      SQS_ENDPOINT: http://localstack:4566
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872
+    depends_on:
+      localstack:
+        condition: service_started
+
+  product-order-service:
+    build:
+      context: ./backend/molymarket-product-order-service
+      dockerfile: Dockerfile
+    container_name: molymarket-product-order-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 5LPknwJUh0dJtp
+      SQS_ENDPOINT: http://localstack:4566
+      AUTH_SERVICE_URL: http://uam-service:8082
+      PAYMENT_SERVICE_URL: http://payment-service:8083
+      NOTIFICATION_SERVICE_URL: http://notification-service:8084
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872
+    depends_on:
+      localstack:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend/molymarket-frontend
+      dockerfile: Dockerfile
+      args:
+        # These must be set to the host's public IP or domain when deploying on AWS.
+        VITE_PRODUCT_ORDER_SERVICE_URL: ${VITE_PRODUCT_ORDER_SERVICE_URL:-http://localhost:8085}
+        VITE_UAM_SERVICE_URL: ${VITE_UAM_SERVICE_URL:-http://localhost:8082}
+        VITE_NOTIFICATION_SERVICE_URL: ${VITE_NOTIFICATION_SERVICE_URL:-http://localhost:8084}
+    container_name: molymarket-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - uam-service
+      - product-order-service
+      - notification-service
