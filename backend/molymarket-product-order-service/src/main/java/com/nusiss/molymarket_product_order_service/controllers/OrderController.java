@@ -35,18 +35,6 @@ public class OrderController {
         }
     }
 
-    // 2. Get list of order items as a seller
-    @GetMapping("/items/seller/{sellerId}")
-    @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
-    public ResponseEntity<?> getOrderItemsBySellerId(@PathVariable Long sellerId) {
-        try {
-            List<OrderItemDto> orderItems = orderService.getOrderItemsBySellerId(sellerId);
-            return new ResponseEntity<>(orderItems, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-        }
-    }
-
     // 3. Get list of orders as a buyer
     @GetMapping("/buyer/{buyerId}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
