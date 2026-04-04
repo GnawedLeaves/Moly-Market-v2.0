@@ -31,7 +31,7 @@ const NotificationPanel: React.FC = () => {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_NOTIFICATION_SERVICE_URL!}/notif/getNotifications?userId=${
+        `${import.meta.env.VITE_NOTIFICATION_SERVICE_URL!}/api/notification/notif/getNotifications?userId=${
           user?.id
         }`,
         config

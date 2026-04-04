@@ -79,7 +79,7 @@ export const AddProduct = () => {
 
     try {
       await axios.post(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/products`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/products`,
         formData,
         {
           headers: {

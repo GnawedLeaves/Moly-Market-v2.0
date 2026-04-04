@@ -55,7 +55,7 @@ function LandingPage() {
       const uen = values.uen;
       const address = values.address;
       const response = await axios.post(
-        `${import.meta.env.VITE_UAM_SERVICE_URL!}/auth/addNewUser`,
+        `${import.meta.env.VITE_UAM_SERVICE_URL!}/api/uam/auth/addNewUser`,
         role === BUYER
           ? {
               username,
@@ -88,7 +88,7 @@ function LandingPage() {
       const username = values.username;
       const password = values.password;
       const response = await axios.post(
-        `${import.meta.env.VITE_UAM_SERVICE_URL!}/auth/generateToken`,
+        `${import.meta.env.VITE_UAM_SERVICE_URL!}/api/uam/auth/generateToken`,
         { username, password }
       );
       console.log("response", response);

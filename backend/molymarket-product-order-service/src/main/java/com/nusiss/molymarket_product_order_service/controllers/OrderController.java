@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/product-order/orders")
 public class OrderController {
 
     @Autowired
     private OrderService orderService;
 
     // 1. Get list of orders as a seller
-    @GetMapping("/orders/seller/{sellerId}")
+    @GetMapping("/seller/{sellerId}")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<?> getOrdersBySellerId(@PathVariable Long sellerId) {
         try {
@@ -36,7 +36,7 @@ public class OrderController {
     }
 
     // 2. Get list of order items as a seller
-    @GetMapping("/order-items/seller/{sellerId}")
+    @GetMapping("/items/seller/{sellerId}")
     @PreAuthorize("hasAnyAuthority('ROLE_SELLER')")
     public ResponseEntity<?> getOrderItemsBySellerId(@PathVariable Long sellerId) {
         try {
@@ -48,7 +48,7 @@ public class OrderController {
     }
 
     // 3. Get list of orders as a buyer
-    @GetMapping("/orders/buyer/{buyerId}")
+    @GetMapping("/buyer/{buyerId}")
     @PreAuthorize("hasAnyAuthority('ROLE_BUYER')")
     public ResponseEntity<?> getOrdersByBuyerId(@PathVariable Long buyerId) {
         try {

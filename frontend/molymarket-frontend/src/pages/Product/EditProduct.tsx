@@ -55,7 +55,7 @@ const EditProduct = () => {
       };
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/products/${id}`,
+          `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/products/${id}`,
           config
         );
         setProduct(response.data);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import { RootState } from "../../redux/store";
 import { logout, updateBalance } from "../../redux/userSlice";
 import { BUYER } from "../../constants/constants";
@@ -16,6 +17,7 @@ import {
   Statistic,
   Modal,
   message,
+  InputNumber,
 } from "antd";
 import {
   DollarOutlined,
@@ -40,6 +42,7 @@ function Profile() {
   const token = useDesignToken();
 
   const [isTopUpModalVisible, setIsTopUpModalVisible] = useState(false);
+  const [topUpAmount, setTopUpAmount] = useState<number>(100);
 
   const onLogout = () => {
     dispatch(logout(user));
@@ -64,12 +67,44 @@ function Profile() {
     setIsTopUpModalVisible(true);
   };
 
-  const handleTopUp = (method: string) => {
-    const topUpAmount = 100; // Hardcoded amount for now
-    const newBalance = (user.balance || 0) + topUpAmount;
-    dispatch(updateBalance(newBalance));
-    message.success(`Successfully topped up $${topUpAmount} via ${method}!`);
-    setIsTopUpModalVisible(false);
+  const handleTopUp = async (method: string) => {
+    if (!user.id || user.id === -1) {
+      message.error("User not found!");
+      return;
+    }
+
+    if (!topUpAmount || topUpAmount <= 0) {
+      message.error("Please enter a valid amount!");
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${
+          import.meta.env.VITE_UAM_SERVICE_URL!
+        }/api/uam/auth/updateBalanceById`,
+        null,
+        {
+          params: {
+            userId: user.id,
+            amount: topUpAmount,
+            operation: "ADD",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        const newBalance = (user.balance || 0) + topUpAmount;
+        dispatch(updateBalance(newBalance));
+        message.success(
+          `Successfully topped up $${topUpAmount.toFixed(2)} via ${method}!`
+        );
+        setIsTopUpModalVisible(false);
+      }
+    } catch (error) {
+      console.error("Top-up failed:", error);
+      message.error("Failed to top up. Please try again later.");
+    }
   };
 
   const { Title, Text, Paragraph } = Typography;
@@ -319,10 +354,24 @@ function Profile() {
         centered
       >
         <Paragraph>
-          Select your preferred top-up method. For demonstration purposes, each
-          top-up will add <strong>$100.00</strong> to your account.
+          Enter the amount you would like to top up and select your preferred
+          method.
         </Paragraph>
-        <Flex vertical gap={12} style={{ marginTop: 20 }}>
+
+        <InputNumber
+          min={1}
+          max={10000}
+          value={topUpAmount}
+          style={{ width: "100%", marginBottom: 20 }}
+          formatter={(value) =>
+            value ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+          }
+          parser={(value) => Number(value!.replace(/\$\s?|(,*)/g, ""))}
+          onChange={(value) => setTopUpAmount(value || 0)}
+          size="large"
+        />
+
+        <Flex vertical gap={12}>
           <CustomButton
             icon={<BankOutlined />}
             size="large"

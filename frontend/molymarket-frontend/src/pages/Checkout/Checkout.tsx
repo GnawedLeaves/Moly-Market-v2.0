@@ -57,7 +57,7 @@ const Checkout = () => {
   const fetchCart = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/${user?.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/${user?.id}`,
         config,
       );
       setCart(response.data);
@@ -98,7 +98,7 @@ const Checkout = () => {
       // Call checkoutCart in product-order-service
       // It handles payment, balance updates, order creation and buyer notification
       await axios.post(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/checkout/${cart?.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/checkout/${cart?.id}`,
         {
           paymentType: paymentMethod,
           amount: calculateOrderSummary().total,
@@ -120,7 +120,7 @@ const Checkout = () => {
     for (const item of cart.items) {
       try {
         await axios.post(
-          `${import.meta.env.VITE_NOTIFICATION_SERVICE_URL!}/notif/createNotification`,
+          `${import.meta.env.VITE_NOTIFICATION_SERVICE_URL!}/api/notification/notif/createNotification`,
           {
             senderId: user.id,
             message: `An order for '${item.name}' has been placed!`,

@@ -73,7 +73,7 @@ export const ViewProduct = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/products/seller/${user.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/products/seller/${user.id}`,
         config
       );
       setProducts(response.data);

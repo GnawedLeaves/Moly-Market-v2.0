@@ -57,7 +57,7 @@ function OrderFulfillment() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/order-items/seller/${user.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/order-items/seller/${user.id}`,
         config
       );
       setOrders(response.data);
@@ -72,7 +72,7 @@ function OrderFulfillment() {
   const getBuyerIdByOrderId = async (orderId: number) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/orders/seller/${user.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/orders/seller/${user.id}`,
         config
       );
       const ordersBuyerId = response.data;
@@ -90,7 +90,7 @@ function OrderFulfillment() {
   const getAddressByBuyerId = async (buyerId: number) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_UAM_SERVICE_URL}/auth/buyerProfile?buyerId=${buyerId}`,
+        `${import.meta.env.VITE_UAM_SERVICE_URL}/api/uam/auth/buyerProfile?buyerId=${buyerId}`,
         config
       );
       return response.data.address;
@@ -111,7 +111,7 @@ function OrderFulfillment() {
       await Promise.all(
         itemsToShip.map((item: any) =>
           axios.post(
-            `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/order-items/${item.id}/next`,
+            `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/order-items/${item.id}/next`,
             {},
             config
           )
@@ -132,7 +132,7 @@ function OrderFulfillment() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/products/seller/${user.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/products/seller/${user.id}`,
         config
       );
       setProducts(response.data);

@@ -59,7 +59,7 @@ function Orders() {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/orders/buyer/${user.id}`,
+          `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/orders/buyer/${user.id}`,
           config
         );
         setOrders(response.data);
@@ -96,7 +96,7 @@ function Orders() {
     try {
       setLoadingProducts((prev) => ({ ...prev, [productId]: true }));
       const response = await axios.get(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/products/${productId}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL}/api/product-order/products/${productId}`,
         config
       );
       setProductDetails((prev) => ({
