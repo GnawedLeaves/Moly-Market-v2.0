@@ -1,0 +1,13 @@
+services:
+  frontend:
+    build:
+      context: ./frontend/molymarket-frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_UAM_SERVICE_URL: ${VITE_UAM_SERVICE_URL:-http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com}
+        VITE_PAYMENT_SERVICE_URL: ${VITE_PAYMENT_SERVICE_URL:-http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com}
+        VITE_NOTIFICATION_SERVICE_URL: ${VITE_NOTIFICATION_SERVICE_URL:-http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com}
+        VITE_PRODUCT_ORDER_SERVICE_URL: ${VITE_PRODUCT_ORDER_SERVICE_URL:-http://alb-molymarket-prd-844455503.ap-southeast-2.elb.amazonaws.com}
+    container_name: molymarket-frontend
+    ports:
+      - "80:80"

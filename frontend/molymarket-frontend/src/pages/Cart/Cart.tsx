@@ -36,7 +36,7 @@ const Cart = () => {
   const token = useDesignToken();
   const fetchCart = async () => {
     const response = await axios.get(
-      `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/${user?.id}`,
+      `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/${user?.id}`,
       {
         headers: {
           Authorization: `Bearer ${user?.token}`,
@@ -52,7 +52,7 @@ const Cart = () => {
   const onClearCart = async () => {
     try {
       const response = await axios.put(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/empty/${cart?.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/empty/${cart?.id}`,
         {},
         {
           headers: {
@@ -69,7 +69,7 @@ const Cart = () => {
   const onUndo = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/undo/${cart?.id}`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/undo/${cart?.id}`,
         {},
         {
           headers: {
@@ -102,7 +102,7 @@ const Cart = () => {
 
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/remove`,
+        `${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/remove`,
         data,
         {
           headers: {

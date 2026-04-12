@@ -1,0 +1,66 @@
+{
+  "family": "product-order-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "product-order-service",
+      "image": "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_AWS_REGION.amazonaws.com/molymarket-product-order-service:latest",
+      "portMappings": [
+        {
+          "containerPort": 8085,
+          "hostPort": 8085,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "SPRING_DATASOURCE_URL",
+          "value": "jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres"
+        },
+        {
+          "name": "SPRING_DATASOURCE_USERNAME",
+          "value": "postgres"
+        },
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "value": "REDACTED"
+        },
+        {
+          "name": "SQS_ENDPOINT",
+          "value": "http://localstack:4566"
+        },
+        {
+          "name": "AUTH_SERVICE_URL",
+          "value": "http://uam-service.local:8082"
+        },
+        {
+          "name": "PAYMENT_SERVICE_URL",
+          "value": "http://payment-service.local:8083"
+        },
+        {
+          "name": "NOTIFICATION_SERVICE_URL",
+          "value": "http://notification-service.local:8084"
+        },
+        {
+          "name": "SECRET_KEY",
+          "value": "d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/product-order-service",
+          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+}

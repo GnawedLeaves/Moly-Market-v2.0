@@ -1,0 +1,13 @@
+services:
+  uam-service:
+    build:
+      context: ./backend/molymarket-uam-service
+      dockerfile: Dockerfile
+    container_name: molymarket-uam-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://molymarket-db.cp222oaeec4l.ap-southeast-2.rds.amazonaws.com:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: REDACTED
+      SECRET_KEY: d4b7c0cfcaa2cdee046a66613c831426ef0aac4c1012fb61154bd43a40eed872

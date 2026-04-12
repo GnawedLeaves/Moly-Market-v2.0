@@ -17,7 +17,7 @@ public class PaymentServiceClient {
     private String paymentServiceUrl;
 
     public void makePayment(RequestPaymentDto paymentDto) {
-        String url = paymentServiceUrl + "/api/payment";
+        String url = paymentServiceUrl + "/api/payment/pay";
         restTemplate.postForEntity(url, paymentDto, String.class);
     }
 }

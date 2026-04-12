@@ -16,6 +16,7 @@ import { Product } from "../../types/Product";
 interface ProductCardProps {
   product: Product;
   user: {
+    id: number;
     username: string;
     token: string;
     role: string;
@@ -37,13 +38,14 @@ const ProductCard = ({ product, user, cartId }: ProductCardProps) => {
   const addToCart = async () => {
     const data = {
       username: user?.username,
+      buyerId: user?.id,
       productId: product.id,
       quantity: quantity,
       cartId,
     };
 
     try {
-      await axios.post(`${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/cart/add`, data, {
+      await axios.post(`${import.meta.env.VITE_PRODUCT_ORDER_SERVICE_URL!}/api/product-order/cart/add`, data, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },

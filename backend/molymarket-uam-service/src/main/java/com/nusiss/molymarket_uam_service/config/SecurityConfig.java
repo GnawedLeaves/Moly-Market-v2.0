@@ -41,9 +41,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable()) // Disable CSRF for stateless APIs
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken", "/auth/updateBalance", "/auth/updateBalanceById", "/auth/getUserId").permitAll()
-                .requestMatchers("/auth/user/**", "/auth/buyerProfile/**", "/auth/sellerProfile/**").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")                
-                .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
+                .requestMatchers("/api/uam/auth/welcome", "/api/uam/auth/welcome/", "/api/uam/auth/addNewUser", "/api/uam/auth/generateToken", "/api/uam/auth/updateBalance", "/api/uam/auth/updateBalanceById", "/api/uam/auth/getUserId").permitAll()
+                .requestMatchers("/api/uam/auth/user/**", "/api/uam/auth/buyerProfile/**", "/api/uam/auth/sellerProfile/**").hasAnyAuthority("ROLE_BUYER", "ROLE_SELLER")                
+                .requestMatchers("/api/uam/auth/admin/**").hasAuthority("ROLE_ADMIN")
                 .anyRequest().authenticated() // Protect all other endpoints
             )
             .sessionManagement(sess -> sess

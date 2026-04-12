@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
-@RequestMapping("/notif")
+@RequestMapping("/api/notification/notif")
 public class NotificationController {
 
     @Autowired
