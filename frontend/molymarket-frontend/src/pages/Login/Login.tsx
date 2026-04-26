@@ -220,7 +220,7 @@ function LandingPage() {
               margin: 0,
             }}
           >
-            Moly Market
+            Moly Market 2.0
           </CustomTypography.Title>
 
           <CustomTypography.Title
