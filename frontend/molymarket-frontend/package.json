@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test:unit": "jest --config=jest.unit.config.ts",
     "test:selenium": "jest --config=jest.config.ts"
   },
   "dependencies": {
