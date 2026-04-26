@@ -32,6 +32,11 @@ jobs:
           npm install
           npm run lint
 
+      - name: Run Frontend Unit Tests
+        run: |
+          cd frontend/molymarket-frontend
+          npm run test:unit
+
   # --- CD Job: Build and Deploy Frontend ---
   deploy:
     name: CD - Deploy Frontend
