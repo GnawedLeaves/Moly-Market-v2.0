@@ -86,10 +86,10 @@ jobs:
           container-name: frontend
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy Amazon ECS task definition
+      - name: Deploy to Amazon ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: frontend
-          cluster: molymarket-cluster
+          service: ${{ matrix.family }}
+          cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
