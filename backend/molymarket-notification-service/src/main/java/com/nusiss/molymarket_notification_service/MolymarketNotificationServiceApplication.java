@@ -1,3 +1,4 @@
+// Trivial change to trigger CI/CD for notification service
 package com.nusiss.molymarket_notification_service;
 
 import org.springframework.boot.SpringApplication;
