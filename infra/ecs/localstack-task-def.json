@@ -25,18 +25,22 @@
         },
         {
           "name": "DEFAULT_REGION",
-          "value": "us-east-1"
+          "value": "ap-southeast-2"
         }
       ],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/localstack",
-          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::088989221715:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

@@ -1,5 +1,5 @@
 {
-  "family": "uam-service",
+  "family": "uam",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "FARGATE"
@@ -8,8 +8,8 @@
   "memory": "512",
   "containerDefinitions": [
     {
-      "name": "uam-service",
-      "image": "guokecheng/molymarket-uam-service:latest",
+      "name": "uam",
+      "image": "088989221715.dkr.ecr.ap-southeast-2.amazonaws.com/molymarket/uam:latest",
       "portMappings": [
         {
           "containerPort": 8082,
@@ -29,7 +29,7 @@
         },
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
-          "value": "REDACTED"
+          "value": "5LPknwJUh0dJtp"
         },
         {
           "name": "SECRET_KEY",
@@ -39,12 +39,16 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/molymarket-uam",
+          "awslogs-group": "/ecs/uam",
           "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::088989221715:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

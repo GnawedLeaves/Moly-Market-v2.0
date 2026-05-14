@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - Frontend Test
+name: CI/CD Pipeline
 
 on:
   push:
@@ -9,11 +9,144 @@ on:
 env:
   AWS_REGION: ap-southeast-2
   ECR_REPOSITORY_PREFIX: molymarket
+  ECS_CLUSTER: molymarket-cluster
 
 jobs:
-  # --- CI Job: Frontend Linting ---
-  ci:
-    name: CI - Frontend Lint
+  # --- Filter Job: Detect which services have changed ---
+  filter:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      notification: ${{ steps.filter.outputs.notification }}
+      uam: ${{ steps.filter.outputs.uam }}
+      payment: ${{ steps.filter.outputs.payment }}
+      product_order: ${{ steps.filter.outputs.product_order }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Path Filter
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'frontend/molymarket-frontend/**'
+            notification:
+              - 'backend/molymarket-notification-service/**'
+            uam:
+              - 'backend/molymarket-uam-service/**'
+            payment:
+              - 'backend/molymarket-payment-service/**'
+            product_order:
+              - 'backend/molymarket-product-order-service/**'
+
+  # --- Backend CI/CD Job ---
+  backend-deploy:
+    name: Backend - ${{ matrix.service }}
+    needs: filter
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: notification
+            path: backend/molymarket-notification-service
+            family: notification
+            container: notification
+            task_def: infra/ecs/notification-service-task-def.json
+          - service: uam
+            path: backend/molymarket-uam-service
+            family: uam
+            container: uam
+            task_def: infra/ecs/uam-service-task-def.json
+          - service: payment
+            path: backend/molymarket-payment-service
+            family: payment
+            container: payment
+            task_def: infra/ecs/payment-service-task-def.json
+          - service: product_order
+            path: backend/molymarket-product-order-service
+            family: product-order
+            container: product-order
+            task_def: infra/ecs/product-order-service-task-def.json
+    if: needs.filter.outputs[matrix.service] == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Run Tests
+        run: |
+          cd ${{ matrix.path }}
+          chmod +x gradlew
+          ./gradlew test
+
+      - name: Configure AWS credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Calculate Version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        id: versioning
+        run: |
+          MAJOR=1
+          OFFSET=6
+          MINOR=$(( ${{ github.run_number }} + $OFFSET ))
+          echo "tag=v$MAJOR.$MINOR" >> $GITHUB_OUTPUT
+
+      - name: Build and Push to ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        id: build-image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ steps.versioning.outputs.tag }}
+          REPOSITORY: ${{ env.ECR_REPOSITORY_PREFIX }}/${{ matrix.family }}
+        run: |
+          docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$REPOSITORY:latest ${{ matrix.path }}
+          docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$REPOSITORY:latest
+          echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: Update Task Definition
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ matrix.task_def }}
+          container-name: ${{ matrix.container }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy to ECS
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ matrix.family }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+  # --- Frontend CI/CD Job ---
+  frontend-deploy:
+    name: Frontend
+    needs: filter
+    if: needs.filter.outputs.frontend == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -26,28 +159,15 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/molymarket-frontend/package-lock.json
 
-      - name: Lint Frontend
+      - name: Lint and Test Frontend
         run: |
           cd frontend/molymarket-frontend
           npm install
           npm run lint
-
-      - name: Run Frontend Unit Tests
-        run: |
-          cd frontend/molymarket-frontend
           npm run test:unit
 
-  # --- CD Job: Build and Deploy Frontend ---
-  deploy:
-    name: CD - Deploy Frontend
-    needs: ci
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Configure AWS credentials
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -55,30 +175,34 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
       - name: Calculate Version
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: versioning
         run: |
           MAJOR=1
           OFFSET=6
           MINOR=$(( ${{ github.run_number }} + $OFFSET ))
-          echo "tag=$MAJOR.$MINOR" >> $GITHUB_OUTPUT
+          echo "tag=v$MAJOR.$MINOR" >> $GITHUB_OUTPUT
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build and Push to ECR
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG: ${{ steps.versioning.outputs.tag }}
-          REPOSITORY: molymarket/frontend
+          REPOSITORY: ${{ env.ECR_REPOSITORY_PREFIX }}/frontend
         run: |
           docker build -t $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$REPOSITORY:latest frontend/molymarket-frontend
           docker push $ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $ECR_REGISTRY/$REPOSITORY:latest
           echo "image=$ECR_REGISTRY/$REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-      - name: Fill in the new image ID in the Amazon ECS task definition
+      - name: Update Task Definition
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         id: task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
@@ -86,10 +210,11 @@ jobs:
           container-name: frontend
           image: ${{ steps.build-image.outputs.image }}
 
-      - name: Deploy to Amazon ECS
+      - name: Deploy to ECS
+        if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
-          service: ${{ matrix.family }}
+          service: frontend
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true

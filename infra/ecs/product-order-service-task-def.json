@@ -1,5 +1,5 @@
 {
-  "family": "product-order-service",
+  "family": "product-order",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "FARGATE"
@@ -8,8 +8,8 @@
   "memory": "512",
   "containerDefinitions": [
     {
-      "name": "product-order-service",
-      "image": "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_AWS_REGION.amazonaws.com/molymarket-product-order-service:latest",
+      "name": "product-order",
+      "image": "088989221715.dkr.ecr.ap-southeast-2.amazonaws.com/molymarket/product-order:latest",
       "portMappings": [
         {
           "containerPort": 8085,
@@ -29,11 +29,11 @@
         },
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
-          "value": "REDACTED"
+          "value": "5LPknwJUh0dJtp"
         },
         {
           "name": "SQS_ENDPOINT",
-          "value": "http://localstack:4566"
+          "value": "https://sqs.ap-southeast-2.amazonaws.com/088989221715/notification-queue"
         },
         {
           "name": "AUTH_SERVICE_URL",
@@ -55,12 +55,16 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/product-order-service",
-          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-group": "/ecs/product-order",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::088989221715:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }

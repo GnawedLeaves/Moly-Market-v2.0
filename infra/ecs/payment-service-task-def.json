@@ -1,5 +1,5 @@
 {
-  "family": "payment-service",
+  "family": "payment",
   "networkMode": "awsvpc",
   "requiresCompatibilities": [
     "FARGATE"
@@ -8,8 +8,8 @@
   "memory": "512",
   "containerDefinitions": [
     {
-      "name": "payment-service",
-      "image": "YOUR_AWS_ACCOUNT_ID.dkr.ecr.YOUR_AWS_REGION.amazonaws.com/molymarket-payment-service:latest",
+      "name": "payment",
+      "image": "088989221715.dkr.ecr.ap-southeast-2.amazonaws.com/molymarket/payment:latest",
       "portMappings": [
         {
           "containerPort": 8083,
@@ -29,7 +29,7 @@
         },
         {
           "name": "SPRING_DATASOURCE_PASSWORD",
-          "value": "REDACTED"
+          "value": "5LPknwJUh0dJtp"
         },
         {
           "name": "SECRET_KEY",
@@ -39,12 +39,16 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/payment-service",
-          "awslogs-region": "YOUR_AWS_REGION",
+          "awslogs-group": "/ecs/payment",
+          "awslogs-region": "ap-southeast-2",
           "awslogs-stream-prefix": "ecs"
         }
       }
     }
   ],
-  "executionRoleArn": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:role/ecsTaskExecutionRole"
+  "executionRoleArn": "arn:aws:iam::088989221715:role/ecsTaskExecutionRole",
+  "runtimePlatform": {
+    "cpuArchitecture": "X86_64",
+    "operatingSystemFamily": "LINUX"
+  }
 }
