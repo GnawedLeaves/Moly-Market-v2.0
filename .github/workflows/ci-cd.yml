@@ -12,16 +12,13 @@ env:
   ECS_CLUSTER: molymarket-cluster
 
 jobs:
-  # --- Filter Job: Detect which services have changed ---
+  # --- Filter Job: Detect which services have changed and build the matrix ---
   filter:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      frontend: ${{ steps.filter.outputs.frontend }}
-      notification: ${{ steps.filter.outputs.notification }}
-      uam: ${{ steps.filter.outputs.uam }}
-      payment: ${{ steps.filter.outputs.payment }}
-      product_order: ${{ steps.filter.outputs.product_order }}
+      backend_matrix: ${{ steps.set-matrix.outputs.matrix }}
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -42,35 +39,41 @@ jobs:
             product_order:
               - 'backend/molymarket-product-order-service/**'
 
+      - name: Generate Backend Matrix
+        id: set-matrix
+        run: |
+          SERVICES=()
+          if [ "${{ steps.filter.outputs.notification }}" == "true" ]; then 
+            SERVICES+=('{"service":"notification","path":"backend/molymarket-notification-service","family":"notification","container":"notification","task_def":"infra/ecs/notification-service-task-def.json"}')
+          fi
+          if [ "${{ steps.filter.outputs.uam }}" == "true" ]; then 
+            SERVICES+=('{"service":"uam","path":"backend/molymarket-uam-service","family":"uam","container":"uam","task_def":"infra/ecs/uam-service-task-def.json"}')
+          fi
+          if [ "${{ steps.filter.outputs.payment }}" == "true" ]; then 
+            SERVICES+=('{"service":"payment","path":"backend/molymarket-payment-service","family":"payment","container":"payment","task_def":"infra/ecs/payment-service-task-def.json"}')
+          fi
+          if [ "${{ steps.filter.outputs.product_order }}" == "true" ]; then 
+            SERVICES+=('{"service":"product_order","path":"backend/molymarket-product-order-service","family":"product-order","container":"product-order","task_def":"infra/ecs/product-order-service-task-def.json"}')
+          fi
+          
+          # Create a JSON array from the collected services
+          if [ ${#SERVICES[@]} -eq 0 ]; then
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+          else
+            # Join array elements with commas and wrap in brackets
+            MATRIX_JSON=$(printf ",%s" "${SERVICES[@]}")
+            echo "matrix=[${MATRIX_JSON:1}]" >> $GITHUB_OUTPUT
+          fi
+
   # --- Backend CI/CD Job ---
   backend-deploy:
     name: Backend - ${{ matrix.service }}
     needs: filter
+    if: needs.filter.outputs.backend_matrix != '[]'
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - service: notification
-            path: backend/molymarket-notification-service
-            family: notification
-            container: notification
-            task_def: infra/ecs/notification-service-task-def.json
-          - service: uam
-            path: backend/molymarket-uam-service
-            family: uam
-            container: uam
-            task_def: infra/ecs/uam-service-task-def.json
-          - service: payment
-            path: backend/molymarket-payment-service
-            family: payment
-            container: payment
-            task_def: infra/ecs/payment-service-task-def.json
-          - service: product_order
-            path: backend/molymarket-product-order-service
-            family: product-order
-            container: product-order
-            task_def: infra/ecs/product-order-service-task-def.json
-    if: needs.filter.outputs[matrix.service] == 'true'
+        include: ${{ fromJSON(needs.filter.outputs.backend_matrix) }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -146,7 +149,7 @@ jobs:
   frontend-deploy:
     name: Frontend
     needs: filter
-    if: needs.filter.outputs.frontend == 'true'
+    if: needs.filter.outputs.frontend_changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
