@@ -1,3 +1,4 @@
+// Trivial change to trigger CI/CD for frontend
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login/Login";
 import Home from "./pages/Home/Home";
